@@ -1,0 +1,358 @@
+<!-- ... existing code ... -->
+    <title>Gestionale Macchinoso</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Stile moderno ma asettico, tipico dei gestionali low-cost */
+        body {
+            background-color: #f8fafc; /* Slate 50 */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #334155;
+        }
+        
+        .desktop-container {
+            width: 1200px; /* Forzatura Desktop: spaccherà totalmente il layout mobile */
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            min-height: 800px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sys-header {
+            background-color: #0f172a; /* Slate 900 */
+            color: #f8fafc;
+            padding: 16px 24px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sys-header-title {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-bar {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 24px;
+            font-size: 13px;
+            background: #ffffff;
+            display: flex;
+            gap: 24px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .modern-input {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #ffffff;
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #334155;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .modern-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .modern-btn {
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .modern-btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .modern-btn-primary:hover:not(:disabled) {
+            background-color: #1d4ed8;
+        }
+
+        .modern-btn-warning {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        .modern-btn-warning:hover:not(:disabled) {
+            background-color: #d97706;
+        }
+
+        .modern-btn:disabled {
+            background-color: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .data-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            font-size: 13px;
+        }
+
+        .data-table th, .data-table td {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 16px;
+            text-align: left;
+        }
+
+        .data-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table tr:hover td {
+            background-color: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="desktop-container">
+        
+        <div class="flex flex-1">
+            <!-- Sidebar Inutile moderna -->
+            <div class="w-64 bg-slate-50 border-r border-slate-200 p-4 flex flex-col gap-2">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-4">Gestione Vetture</div>
+                <button class="text-left px-4 py-2 rounded-md bg-blue-50 text-blue-700 font-medium text-sm">Nuovo Inserimento</button>
+                <button class="text-left px-4 py-2 rounded-md hover:bg-slate-100 text-slate-600 text-sm transition-colors">Lista Veicoli</button>
+                
+                <div class="mt-auto bg-blue-50 border border-blue-100 rounded-lg p-4 text-xs text-blue-800">
+                    <strong>Suggerimento di Sistema:</strong> L'ID record non è auto-incrementante. Verificare manualmente l'ultimo ID utilizzato nella tabella sottostante prima di salvare.
+                </div>
+            </div>
+
+            <!-- Area Principale -->
+            <div class="flex-1 p-8 overflow-y-auto">
+                
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold text-slate-800">Nuovo Veicolo</h1>
+                    <span class="text-sm text-slate-500">I campi contrassegnati con * sono obbligatori.</span>
+                </div>
+                
+                <!-- Card del Form -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-8">
+                    
+                    <!-- Finto box messaggi -->
+                    <div id="system-msg" class="hidden m-4 p-3 rounded-lg text-sm font-medium border"></div>
+
+                    <div class="p-6">
+                        <div class="grid grid-cols-2 gap-x-8 gap-y-6">
+                            <!-- Colonna Sinistra -->
+                            <div class="flex flex-col gap-5 text-sm">
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="font-medium text-slate-700">ID Record Interno *</label>
+                                    <input type="number" id="input-id" class="modern-input w-32" placeholder="Es. 7">
+                                </div>
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="font-medium text-slate-700">Marca *</label>
+                                    <input type="text" id="input-brand" class="modern-input" placeholder="Es. Fiat">
+                                </div>
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="font-medium text-slate-700">Modello Completo</label>
+                                    <input type="text" id="input-model" class="modern-input" placeholder="Es. Punto 1.2 Lounge">
+                                </div>
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="font-medium text-slate-700">Anno Immatricolazione</label>
+                                    <input type="number" id="input-year" class="modern-input w-32" placeholder="2020">
+                                </div>
+                            </div>
+
+                            <!-- Colonna Destra -->
+                            <div class="flex flex-col gap-5 text-sm">
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="font-medium text-slate-700">Prezzo di Vendita (senza valuta) *</label>
+                                    <input type="text" id="input-price" class="modern-input w-48" placeholder="9.500">
+                                </div>
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="font-medium text-slate-700">Chilometraggio Attuale</label>
+                                    <input type="text" id="input-km" class="modern-input w-48" placeholder="50.000">
+                                </div>
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="font-medium text-slate-700">Alimentazione</label>
+                                    <select id="input-fuel" class="modern-input">
+                                        <option value="">-- Seleziona Alimentazione --</option>
+                                        <option value="Benzina">Benzina</option>
+                                        <option value="Diesel">Diesel</option>
+                                        <option value="GPL">GPL</option>
+                                        <option value="Ibrida">Ibrida</option>
+                                        <option value="Elettrica">Elettrica</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col gap-1.5">
+                                    <label class="font-medium text-slate-700">URL Immagine Esterna (Media Library disabilitata)</label>
+                                    <input type="text" id="input-img" class="modern-input text-xs text-slate-500" placeholder="https://miosito.com/img/auto1.jpg">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex flex-col gap-1.5">
+                            <label class="font-medium text-slate-700 text-sm">Note Interne / Descrizione Pubblica</label>
+                            <textarea id="input-desc" class="modern-input w-full h-24 resize-none" placeholder="Inserire qui i dettagli del veicolo..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Action Bar fastidiosa -->
+                    <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex items-center justify-between rounded-b-xl">
+                        <span class="text-xs text-slate-500">Attenzione: Il salvataggio richiede la verifica pre-caricamento.</span>
+                        <div class="flex gap-3">
+                            <button id="btn-validate" class="modern-btn modern-btn-warning" onclick="validateData()">1. Valida Campi</button>
+                            <button id="btn-save" class="modern-btn modern-btn-primary" disabled onclick="saveData()">2. Pubblica Online</button>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-lg font-bold text-slate-800 mb-4">Inventario Attivo</h2>
+                <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                    <div class="overflow-y-auto max-h-[350px]">
+                        <table class="data-table" id="db-table">
+                            <thead class="sticky top-0 z-10">
+<!-- ... existing code ... -->
+                            </tr>
+                        </thead>
+                        <tbody id="db-body">
+                            <!-- Popolato via JS -->
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulazione Orologio di sistema
+        setInterval(() => {
+            const now = new Date();
+            const clock = document.getElementById('clock');
+            if(clock) clock.innerText = now.toLocaleTimeString('it-IT');
+        }, 1000);
+
+        // Database fittizio per l'avvio
+        const db = [
+            { id: 1, brand: "Fiat", model: "500 1.2 Lounge", year: "2018", price: "9.500", km: "54.000", fuel: "Benzina" },
+            { id: 2, brand: "Volkswagen", model: "Golf 1.6 TDI", year: "2017", price: "14.200", km: "89.000", fuel: "Diesel" },
+            { id: 3, brand: "Audi", model: "A3 Sportback", year: "2019", price: "19.900", km: "62.000", fuel: "Diesel" }
+        ];
+
+        function renderTable() {
+            const tbody = document.getElementById('db-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            
+            db.forEach(car => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="font-medium text-slate-900">#${car.id}</td>
+                    <td class="font-semibold">${car.brand}</td>
+                    <td>${car.model}</td>
+                    <td class="text-slate-500">${car.year}</td>
+                    <td class="font-medium text-green-600">€ ${car.price}</td>
+                    <td class="text-slate-500">${car.km} km</td>
+                    <td><span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs">${car.fuel}</span></td>
+                    <td>
+                        <button class="text-red-500 hover:text-red-700 font-medium text-xs bg-red-50 hover:bg-red-100 px-3 py-1 rounded transition-colors" onclick="deleteFake(${car.id})">Rimuovi</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Funzione inutile per rendere la vita difficile all'utente
+        function validateData() {
+            const id = document.getElementById('input-id').value;
+            const brand = document.getElementById('input-brand').value;
+            const msgBox = document.getElementById('system-msg');
+            const saveBtn = document.getElementById('btn-save');
+
+            msgBox.className = 'm-4 p-3 rounded-lg text-sm font-medium border'; // Reset classi
+
+            if (!id || !brand) {
+                msgBox.classList.add('bg-red-50', 'text-red-700', 'border-red-200');
+                msgBox.innerHTML = "Validazione fallita: ID Record e Marca sono obbligatori.";
+                saveBtn.disabled = true;
+                return;
+            }
+
+            // Simula un controllo lento
+            msgBox.classList.add('bg-blue-50', 'text-blue-700', 'border-blue-200');
+            msgBox.innerHTML = "<span class='flex items-center gap-2'><svg class='animate-spin h-4 w-4 text-blue-600' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'><circle class='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' stroke-width='4'></circle><path class='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path></svg> Sincronizzazione database e controllo integrità in corso...</span>";
+            
+            setTimeout(() => {
+                msgBox.className = 'm-4 p-3 rounded-lg text-sm font-medium border bg-green-50 text-green-700 border-green-200';
+                msgBox.innerHTML = "Check completato. Dati formalmente corretti. Puoi procedere alla pubblicazione.";
+                saveBtn.disabled = false;
+                document.getElementById('btn-validate').disabled = true;
+            }, 1800); 
+        }
+
+        function saveData() {
+            const msgBox = document.getElementById('system-msg');
+
+            const id = document.getElementById('input-id').value;
+            const brand = document.getElementById('input-brand').value;
+            const model = document.getElementById('input-model').value || "-";
+            const year = document.getElementById('input-year').value || "-";
+            const price = document.getElementById('input-price').value || "0";
+            const km = document.getElementById('input-km').value || "0";
+            const fuel = document.getElementById('input-fuel').value || "-";
+            
+            // Aggiungo in cima per simulare un inserimento (senza persistere veramente per demo)
+            const tbody = document.getElementById('db-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="font-medium text-slate-900">#${id}</td>
+                <td class="font-semibold text-blue-600">${brand} <span class="text-xs bg-blue-100 text-blue-800 px-1 rounded ml-1">NEW</span></td>
+                <td>${model}</td>
+                <td class="text-slate-500">${year}</td>
+                <td class="font-medium text-green-600">€ ${price}</td>
+                <td class="text-slate-500">${km} km</td>
+                <td><span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs">${fuel}</span></td>
+                <td>
+                    <button class="text-red-500 hover:text-red-700 font-medium text-xs bg-red-50 hover:bg-red-100 px-3 py-1 rounded transition-colors" onclick="deleteFake(${id})">Rimuovi</button>
+                </td>
+            `;
+            tbody.insertBefore(tr, tbody.firstChild);
+
+            // Reset dei campi
+            document.querySelectorAll('.modern-input').forEach(input => input.value = '');
+            document.getElementById('btn-save').disabled = true;
+            document.getElementById('btn-validate').disabled = false;
+
+            msgBox.className = 'm-4 p-3 rounded-lg text-sm font-medium border bg-blue-50 text-blue-700 border-blue-200';
+            msgBox.innerHTML = "Veicolo pubblicato con successo. Inserisci il prossimo record.";
+        }
+
+        function deleteFake(id) {
+            const msgBox = document.getElementById('system-msg');
+            msgBox.className = 'm-4 p-3 rounded-lg text-sm font-medium border bg-red-50 text-red-700 border-red-200';
+            msgBox.innerHTML = `Errore di Sistema #403: Il tuo piano "Basic" non consente la cancellazione dei log di inventario.`;
+        }
+
+        // Init dell'applicazione
+        renderTable();
+    </script>
+</body>
+</html>
